@@ -4,11 +4,38 @@ import FileUploader from './FileUploader.vue'
 import ImageCropTool from './ImageCropTool.vue'
 
 /**
+ * Emits
+ */
+const emit = defineEmits<{
+  (e: 'success'): void;
+  (e: 'error'): void;
+}>()
+
+
+/**
+ * Props
+ */
+interface Props {
+  url: string;
+  ratio?: number;
+  maxFileSize?: number;
+  headers?: object,
+  extensions?: string;
+  data?: object;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  extensions: 'png,jpg,gif,jpeg',
+})
+
+
+/**
  * States
  */
 const isCropEnabled = ref<Boolean>(false)
 const selectedFile = ref<File | null>(null)
 const croppedImage = ref<Blob | null>(null)
+const uploadProgress = ref<number>(0)
 
 
 /**
@@ -25,6 +52,53 @@ const handleFileChange = (file: File | null) => {
 
 const handleImageCrop = (blob: Blob | null) => {
   croppedImage.value = blob
+
+  uploadImage()
+}
+
+const fireSuccessEvent = (): void => {
+  emit('success')
+}
+
+const fireErrorEvent = () => {
+  emit('error')
+} 
+
+const uploadImage: () => void = () => {
+  const image = croppedImage.value
+
+  if (!image) return
+
+  const xhr: XMLHttpRequest = new XMLHttpRequest();
+  const formData: FormData = new FormData();
+
+  formData.append('file', image)
+
+  xhr.open("POST", props.url, true);
+
+  // Progress event
+  xhr.upload.onprogress = function(event) {
+    if (event.lengthComputable) {
+      uploadProgress.value = (event.loaded / event.total) * 100;
+    }
+  };
+
+  // Success event
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      fireSuccessEvent()
+    } else {
+      fireErrorEvent()
+    }
+  };
+
+  // Error event
+  xhr.onerror = function() {
+    fireErrorEvent()
+  };
+
+  // Send the form data
+  xhr.send(formData);
 }
 </script>
 
@@ -36,9 +110,9 @@ const handleImageCrop = (blob: Blob | null) => {
   <teleport to="body">
     <ImageCropTool 
       v-if="isCropEnabled && selectedFile" 
-      @crop="handleImageCrop"
-      @cancel="disableCrop"
       :src="selectedFile"
+      @cancel="disableCrop"
+      @crop="handleImageCrop"
     />
   </teleport>
 </template>
