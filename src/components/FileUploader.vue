@@ -22,10 +22,14 @@ const activator = () => {
   fileInputRef.value?.click()  
 }
 
-const handleFileChange = (event: Event): void => {
-  const target = event.target as HTMLInputElement
-  const file: File | null = target.files?[0]
-  emit('change', file)
+const handleChange = (event: Event): void => {
+  const targetElement = event.target as HTMLInputElement
+  const selectedFileList = targetElement.files
+
+  if (selectedFileList) {
+    const selectedFile = selectedFileList[0]
+    emit('change', selectedFile)
+  }
 }
 </script>
 
@@ -38,7 +42,7 @@ const handleFileChange = (event: Event): void => {
       ref="fileInputRef"
       type="file" 
       class="input-field"
-      @change="handleFileChange" 
+      @change="handleChange" 
     />
   </div>
 </template>

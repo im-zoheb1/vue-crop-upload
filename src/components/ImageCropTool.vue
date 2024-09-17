@@ -1,83 +1,91 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted } from 'vue';
-
-import Cropper from 'cropperjs'
-import 'cropperjs/dist/cropper.css'
+import { ref, computed, nextTick, onMounted, watch } from 'vue';
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 /**
  * Events
  */
 const emit = defineEmits<{
-  (e: 'cancel'): void;
-}>()
-
+  (event: 'cancel'): void;
+  (event: 'crop', value: Blob): void;
+}>();
 
 /**
  * Props
  */
 interface Props {
-  src: string,
-  options?: Cropper.Options,
+  src: File;
+  options?: Cropper.Options;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  src: '',
   options: () => ({}),
-})
-
+});
 
 /**
  * Refs
  */
-const imageRef = ref<HTMLImageElement>()
-const cropper = ref<Cropper | null>(null)
-const croppedImage = ref<Blob | null>(null)
-
+const imageRef = ref<HTMLImageElement | null>(null);
+const cropper = ref<Cropper | null>(null);
 
 /**
- * Computed
+ * Computed - Cropper Configuration
  */
-const cropperConfig = computed((): Cropper.Options => { 
-  if (props.options) return props.options as Cropper.Options
-  return {}
+const cropperConfig = computed((): Cropper.Options => ({
+  ...props.options,
+}));
+
+const imageUrl = computed((): string => {
+  return URL.createObjectURL(props.src)
 })
 
 
 /**
- * Hooks
+ * Watchers
+ */
+watch(
+  () => props.src,
+  () => {
+    initializeCropper();
+  }
+);
+
+/**
+ * Lifecycle Hooks
  */
 onMounted(async () => {
-  await nextTick()
-
-  initializeCropper()
-})
-
+  await nextTick();
+  initializeCropper();
+});
 
 /**
  * Methods
  */
-const initializeCropper = () => {
-  if (!imageRef.value)  return
+const initializeCropper = (): void => {
+  if (!imageRef.value) return;
 
-  // Reset the cropper before setting a new one
-  resetCropper()
+  // Reset the cropper before creating a new one
+  resetCropper();
 
-  cropper.value = new Cropper(imageRef.value, cropperConfig.value)
-}
+  cropper.value = new Cropper(imageRef.value, cropperConfig.value);
+};
 
 const resetCropper = (): void => {
-  cropper.value = null
-}
+  cropper.value?.destroy(); // Properly destroy the cropper instance
+  cropper.value = null;
+};
 
 const handleImageCrop = (): void => {
-  cropper.value?.getCroppedCanvas().toBlob((blob): void => {
-    croppedImage.value = blob
-  })
-}
+  cropper.value?.getCroppedCanvas().toBlob((blob: Blob | null): void => {
+    blob && emit('crop', blob)
+  });
+};
 
-const handleCancelUpload = (): void => {
-  emit('cancel')
-}
+const handleCancel = (): void => {
+  resetCropper();
+  emit('cancel');
+};
 </script>
 
 <template>
@@ -87,7 +95,7 @@ const handleCancelUpload = (): void => {
         <div class="vcu-header-container">
           <h4>Upload Image</h4>
           <div>
-            <button @click="handleCancelUpload">
+            <button @click="handleCancel">
               Cancel
             </button>
             <button class="primary" @click="handleImageCrop">
@@ -97,7 +105,7 @@ const handleCancelUpload = (): void => {
         </div>
       </div>
       <div class="vcu-content">
-        <img ref="imageRef" class="image-el" :src="src" />
+        <img :src="imageUrl" ref="imageRef" class="image-el" />
       </div>
     </div>
   </div>

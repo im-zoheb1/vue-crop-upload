@@ -4,24 +4,11 @@ import FileUploader from './FileUploader.vue'
 import ImageCropTool from './ImageCropTool.vue'
 
 /**
- * Props
- */
-
-
-/**
  * States
  */
-const selectedFile = ref(null)
 const isCropEnabled = ref<Boolean>(false)
-
-
-/**
- * Computed
- */
-
-
-/** * Hooks
- */
+const selectedFile = ref<File | null>(null)
+const croppedImage = ref<Blob | null>(null)
 
 
 /**
@@ -31,12 +18,13 @@ const disableCrop = (): void => {
   isCropEnabled.value = false
 }
 
-const triggerCrop = () => {
+const handleFileChange = (file: File | null) => {
   isCropEnabled.value = true
+  selectedFile.value = file
 }
 
-const handleFileChange = (files: FileList) => {
-  console.log('handle file change', files)
+const handleImageCrop = (blob: Blob | null) => {
+  croppedImage.value = blob
 }
 </script>
 
@@ -47,9 +35,10 @@ const handleFileChange = (files: FileList) => {
 
   <teleport to="body">
     <ImageCropTool 
-      v-if="isCropEnabled" 
+      v-if="isCropEnabled && selectedFile" 
+      @crop="handleImageCrop"
       @cancel="disableCrop"
-      src="https://dummyimage.com/600x400/000/fff" 
+      :src="selectedFile"
     />
   </teleport>
 </template>
