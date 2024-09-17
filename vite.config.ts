@@ -8,9 +8,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve('src', 'lib/main.ts'),
-      name: 'VueComponentNpmExample',
+      name: 'VueCropUpload',
       // the proper extensions will be added
-      fileName: 'vue-component-npm-example'
+      fileName: 'vue-crop-upload'
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled

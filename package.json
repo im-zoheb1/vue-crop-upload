@@ -3,18 +3,31 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "files": ["dist"],
+  "main": "./dist/vue-core-upload.umd.cjs",
+  "module": "./dist/vue-core-upload.js",
+  "types": "./dist/main.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-core-upload.js",
+      "require": "./dist/vue-core-upload.umd.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
   "scripts": {
     "dev": "vite --port 4000",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build": "vite build && vue-tsc --emitDeclarationOnly"
   },
   "dependencies": {
+    "@types/jest": "^29.5.13",
     "cropperjs": "^1.6.2",
     "vue": "^3.4.37"
   },
   "devDependencies": {
     "@types/node": "^22.5.4",
     "@vitejs/plugin-vue": "^5.1.2",
+    "@vue/test-utils": "^2.4.6",
     "typescript": "^5.5.3",
     "vite": "^5.4.1",
     "vue-tsc": "^2.1.6"
