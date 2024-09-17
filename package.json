@@ -1,16 +1,15 @@
 {
   "name": "vue-crop-upload",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
   "files": ["dist"],
-  "main": "./dist/vue-core-upload.umd.cjs",
-  "module": "./dist/vue-core-upload.js",
+  "main": "./dist/vue-crop-upload.umd.cjs",
+  "module": "./dist/vue-crop-upload.js",
   "types": "./dist/main.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/vue-core-upload.js",
-      "require": "./dist/vue-core-upload.umd.js"
+      "import": "./dist/vue-crop-upload.js",
+      "require": "./dist/vue-crop-upload.umd.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
