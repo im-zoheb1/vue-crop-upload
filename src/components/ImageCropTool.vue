@@ -11,6 +11,7 @@ const emit = defineEmits<{
   (event: 'crop', value: Blob): void;
 }>();
 
+
 /**
  * Props
  */
@@ -23,11 +24,14 @@ const props = withDefaults(defineProps<Props>(), {
   options: () => ({}),
 });
 
+
 /**
  * Refs
  */
+const headerRef = ref<HTMLDivElement | null>(null);
 const imageRef = ref<HTMLImageElement | null>(null);
 const cropper = ref<Cropper | null>(null);
+
 
 /**
  * Computed - Cropper Configuration
@@ -38,6 +42,10 @@ const cropperConfig = computed((): Cropper.Options => ({
 
 const imageUrl = computed((): string => {
   return URL.createObjectURL(props.src)
+})
+
+const cropperHeight = computed((): string => {
+  return `calc(100vh - ${headerRef.value?.clientHeight ?? 80}px)`
 })
 
 
@@ -51,6 +59,7 @@ watch(
   }
 );
 
+
 /**
  * Lifecycle Hooks
  */
@@ -58,6 +67,7 @@ onMounted(async () => {
   await nextTick();
   initializeCropper();
 });
+
 
 /**
  * Methods
@@ -91,7 +101,7 @@ const handleCancel = (): void => {
 <template>
   <div class="vcu-dialog">
     <div class="vcu-wrapper">
-      <div class="vcu-header">
+      <div ref="headerRef" class="vcu-header">
         <div class="vcu-header-container">
           <h4>Upload Image</h4>
           <div>
@@ -105,7 +115,12 @@ const handleCancel = (): void => {
         </div>
       </div>
       <div class="vcu-content">
-        <img :src="imageUrl" ref="imageRef" class="image-el" />
+        <img 
+          ref="imageRef" 
+          class="image-el" 
+          :src="imageUrl" 
+          :style="{ height: cropperHeight }" 
+        />
       </div>
     </div>
   </div>
