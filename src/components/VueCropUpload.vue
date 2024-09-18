@@ -7,8 +7,8 @@ import ImageCropTool from './ImageCropTool.vue'
  * Emits
  */
 const emit = defineEmits<{
-  (e: 'success'): void;
-  (e: 'error'): void;
+  (e: 'success', value: any): void;
+  (e: 'error', value: any): void;
 }>()
 
 
@@ -41,13 +41,50 @@ const uploadProgress = ref<number>(0)
 /**
  * Methods
  */
-const disableCrop = (): void => {
-  isCropEnabled.value = false
+const isImageFile = (file: File) => {
+  return file.type.startsWith('image/')
+}
+
+const checkExtension = (file: File) => {
+  const allowedExtensions = props.extensions.split(',').map(ext => ext.trim().toLowerCase())
+  const fileExtension = file.name.split('.').pop()?.toLowerCase()
+  return fileExtension && allowedExtensions.includes(fileExtension)
 }
 
 const handleFileChange = (file: File | null) => {
+  // Check file extension
+  if (!checkExtension(selectedFile)) {
+    emit('error', {
+      type: 'INVALID_FILE_EXTENSION',
+      message: `Invalid file type. Allowed extensions are: ${props.extensions}`,
+    })
+    return
+  }
+
+  // Check if file is an image
+  if (!isImage(selectedFile)) {
+    emit('error', { 
+      type: 'INVALID_FILE_TYPE',
+      message: 'Selected file is not an image.',
+    })
+    return
+  }
+
+  // Check file size
+  if (selectedFile.size > props.maxSize) {
+    emit('error', {
+      type: 'FILE_SIZE_EXCEEDED',
+      message: `File size exceeds the maximum limit of ${props.maxSize / (1024 * 1024)} MB`
+    })
+    return
+  }
+
   isCropEnabled.value = true
   selectedFile.value = file
+}
+
+const disableCrop = (): void => {
+  isCropEnabled.value = false
 }
 
 const handleImageCrop = (blob: Blob | null) => {
