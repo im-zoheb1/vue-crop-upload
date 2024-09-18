@@ -46,6 +46,7 @@ const isImageFile = (file: File) => {
 }
 
 const checkExtension = (file: File) => {
+  console.log('check extension', file)
   const allowedExtensions = props.extensions.split(',').map(ext => ext.trim().toLowerCase())
   const fileExtension = file.name.split('.').pop()?.toLowerCase()
   return fileExtension && allowedExtensions.includes(fileExtension)
@@ -53,7 +54,7 @@ const checkExtension = (file: File) => {
 
 const handleFileChange = (file: File | null) => {
   // Check file extension
-  if (!checkExtension(selectedFile)) {
+  if (!checkExtension(file)) {
     emit('error', {
       type: 'INVALID_FILE_EXTENSION',
       message: `Invalid file type. Allowed extensions are: ${props.extensions}`,
@@ -62,7 +63,7 @@ const handleFileChange = (file: File | null) => {
   }
 
   // Check if file is an image
-  if (!isImage(selectedFile)) {
+  if (!isImage(file)) {
     emit('error', { 
       type: 'INVALID_FILE_TYPE',
       message: 'Selected file is not an image.',
@@ -71,7 +72,7 @@ const handleFileChange = (file: File | null) => {
   }
 
   // Check file size
-  if (selectedFile.size > props.maxFileSize) {
+  if (file.size > props.maxFileSize) {
     emit('error', {
       type: 'FILE_SIZE_EXCEEDED',
       message: `File size exceeds the maximum limit of ${props.maxFileSize / (1024 * 1024)} MB`
