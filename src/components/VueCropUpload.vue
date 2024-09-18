@@ -41,12 +41,11 @@ const uploadProgress = ref<number>(0)
 /**
  * Methods
  */
-const isImageFile = (file: File) => {
+const isImage = (file: File) => {
   return file.type.startsWith('image/')
 }
 
 const checkExtension = (file: File) => {
-  console.log('check extension', file)
   const allowedExtensions = props.extensions.split(',').map(ext => ext.trim().toLowerCase())
   const fileExtension = file.name.split('.').pop()?.toLowerCase()
   return fileExtension && allowedExtensions.includes(fileExtension)
