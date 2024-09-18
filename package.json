@@ -1,8 +1,10 @@
 {
   "name": "vue-crop-upload",
-  "version": "0.0.21",
+  "version": "0.0.23",
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/vue-crop-upload.umd.cjs",
   "module": "./dist/vue-crop-upload.js",
   "types": "./dist/main.d.ts",
