@@ -77,6 +77,12 @@ const uploadImage: () => void = () => {
 
   xhr.open("POST", props.url, true);
 
+
+  // Set headers dynamically from props.headers
+  Object.keys(props.headers).forEach(key => {
+    xhr.setRequestHeader(key, props.headers[key])
+  })
+
   // Progress event
   xhr.upload.onprogress = function(event) {
     if (event.lengthComputable) {

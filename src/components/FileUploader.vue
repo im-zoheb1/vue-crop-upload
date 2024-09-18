@@ -49,7 +49,8 @@ const handleChange = (event: Event): void => {
 
 <style scoped>
 .file-uploader {
-  display: inline-block;
+  display: block;
+  width: 100%;
 }
 .input-field {
   visibility: hidden;
