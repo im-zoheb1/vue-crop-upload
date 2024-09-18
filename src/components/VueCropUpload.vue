@@ -75,8 +75,11 @@ const uploadImage: () => void = () => {
 
   formData.append('file', image)
 
-  xhr.open("POST", props.url, true);
+  Object.keys(props.data).forEach(key => {
+    formData.append(key, props.data[key])
+  })
 
+  xhr.open("POST", props.url, true);
 
   // Set headers dynamically from props.headers
   Object.keys(props.headers).forEach(key => {
