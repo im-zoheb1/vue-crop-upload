@@ -52,6 +52,7 @@ const checkExtension = (file: File) => {
 }
 
 const handleFileChange = (file: File | null): void => {
+  console.log(file.size)
   // Check file extension
   if (!checkExtension(file)) {
     emit('error', {
@@ -133,7 +134,8 @@ const uploadImage: () => void = () => {
   // Success event
   xhr.onload = function() {
     if (xhr.status === 200) {
-      fireSuccessEvent(JSON.parse(xhr.responseText))
+      console.log('xhr', xhr)
+      fireSuccessEvent(response)
     } else {
       fireErrorEvent()
     }
