@@ -7,8 +7,8 @@ import ImageCropTool from './ImageCropTool.vue'
  * Emits
  */
 const emit = defineEmits<{
-  (e: 'success', value: any): void;
-  (e: 'error', value: any): void;
+  (e: 'success', value?: any): void;
+  (e: 'error', value?: any): void;
 }>()
 
 
@@ -51,7 +51,7 @@ const checkExtension = (file: File) => {
   return fileExtension && allowedExtensions.includes(fileExtension)
 }
 
-const handleFileChange = (file: File | null) => {
+const handleFileChange = (file: File | null): void => {
   // Check file extension
   if (!checkExtension(file)) {
     emit('error', {
@@ -133,7 +133,7 @@ const uploadImage: () => void = () => {
   // Success event
   xhr.onload = function() {
     if (xhr.status === 200) {
-      fireSuccessEvent()
+      fireSuccessEvent(JSON.parse(xhr.responseText))
     } else {
       fireErrorEvent()
     }
