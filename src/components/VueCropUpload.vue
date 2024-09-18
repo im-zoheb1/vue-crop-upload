@@ -52,6 +52,7 @@ const handleFileChange = (file: File | null) => {
 
 const handleImageCrop = (blob: Blob | null) => {
   croppedImage.value = blob
+  isCropEnabled.value = false
 
   uploadImage()
 }
@@ -104,7 +105,9 @@ const uploadImage: () => void = () => {
 
 <template>
   <FileUploader @change="handleFileChange">
-    <slot></slot>
+    <template #default="props">
+      <slot v-bind="props"></slot>
+    </template>
   </FileUploader>
 
   <teleport to="body">
@@ -116,3 +119,4 @@ const uploadImage: () => void = () => {
     />
   </teleport>
 </template>
+
