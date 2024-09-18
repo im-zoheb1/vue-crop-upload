@@ -71,10 +71,10 @@ const handleFileChange = (file: File | null) => {
   }
 
   // Check file size
-  if (selectedFile.size > props.maxSize) {
+  if (selectedFile.size > props.maxFileSize) {
     emit('error', {
       type: 'FILE_SIZE_EXCEEDED',
-      message: `File size exceeds the maximum limit of ${props.maxSize / (1024 * 1024)} MB`
+      message: `File size exceeds the maximum limit of ${props.maxFileSize / (1024 * 1024)} MB`
     })
     return
   }
