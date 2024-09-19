@@ -3,18 +3,15 @@ import { ref } from 'vue';
 import FileUploader from './FileUploader.vue'
 import ImageCropTool from './ImageCropTool.vue'
 
-/**
- * Emits
- */
-const emit = defineEmits<{
-  (e: 'success', value: object): void;
-  (e: 'error', value?: any): void;
-}>()
-
 
 /**
- * Props
+ * Types
  */
+interface ErrorEvent {
+  type: 'INVALID_FILE_EXTENSION' | 'FILE_SIZE_EXCEEDED' | 'UPLOAD_ERROR' | 'INVALID_FILE_TYPE',
+  message: string,
+}
+
 interface Props {
   url: string;
   ratio?: number;
@@ -24,6 +21,19 @@ interface Props {
   data?: object;
 }
 
+
+/**
+ * Emits
+ */
+const emit = defineEmits<{
+  (e: 'success', value: object): void;
+  (e: 'error', value: ErrorEvent): void;
+}>()
+
+
+/**
+ * Props
+ */
 const props = withDefaults(defineProps<Props>(), {
   extensions: 'png,jpg,gif,jpeg',
 })
@@ -65,7 +75,7 @@ const handleFileChange = (file: File | null): void => {
 
   // Check file extension
   if (!checkExtension(file)) {
-    emit('error', {
+    fireErrorEvent({
       type: 'INVALID_FILE_EXTENSION',
       message: `Invalid file type. Allowed extensions are: ${props.extensions}`,
     })
@@ -74,7 +84,7 @@ const handleFileChange = (file: File | null): void => {
 
   // Check if file is an image
   if (!isImage(file)) {
-    emit('error', { 
+    fireErrorEvent({ 
       type: 'INVALID_FILE_TYPE',
       message: 'Selected file is not an image.',
     })
@@ -83,7 +93,7 @@ const handleFileChange = (file: File | null): void => {
 
   // Check file size
   if (props.maxFileSize && file.size > props.maxFileSize) {
-    emit('error', {
+    fireErrorEvent({
       type: 'FILE_SIZE_EXCEEDED',
       message: `File size exceeds the maximum limit of ${props.maxFileSize / (1024 * 1024)} MB`
     })
@@ -109,14 +119,16 @@ const fireSuccessEvent = (data: object): void => {
   emit('success', data)
 }
 
-const fireErrorEvent = () => {
-  emit('error')
+const fireErrorEvent = (error) => {
+  emit('error', error)
 } 
 
 const uploadImage: () => void = () => {
   const image = croppedImage.value
 
   if (!image) return
+
+  startLoading()
 
   const xhr: XMLHttpRequest = new XMLHttpRequest();
   const formData: FormData = new FormData();
@@ -146,13 +158,22 @@ const uploadImage: () => void = () => {
     if (xhr.status === 200) {
       fireSuccessEvent(JSON.parse(xhr.responseText));
     } else {
-      fireErrorEvent()
+      fireErrorEvent({
+        type: 'UPLOAD_ERROR',
+        message: 'There was an error uploading the image. Please try again.',
+      })
     }
+
+    endLoading()
   };
 
   // Error event
   xhr.onerror = function() {
-    fireErrorEvent()
+    fireErrorEvent({
+      type: 'UPLOAD_ERROR',
+      message: 'There was an error uploading the image. Please try again.',
+    })
+    endLoading()
   };
 
   // Send the form data
