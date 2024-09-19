@@ -7,7 +7,7 @@ import ImageCropTool from './ImageCropTool.vue'
  * Emits
  */
 const emit = defineEmits<{
-  (e: 'success', value?: any): void;
+  (e: 'success', value: object): void;
   (e: 'error', value?: any): void;
 }>()
 
@@ -35,12 +35,21 @@ const props = withDefaults(defineProps<Props>(), {
 const isCropEnabled = ref<Boolean>(false)
 const selectedFile = ref<File | null>(null)
 const croppedImage = ref<Blob | null>(null)
-const uploadProgress = ref<number>(0)
+const progress = ref<number>(0)
+const loading = ref<boolean>(false)
 
 
 /**
  * Methods
  */
+const startLoading = (): void => {
+  loading.value = true
+}
+
+const endLoading = (): void => {
+  loading.value = false
+}
+
 const isImage = (file: File) => {
   return file.type.startsWith('image/')
 }
@@ -52,7 +61,8 @@ const checkExtension = (file: File) => {
 }
 
 const handleFileChange = (file: File | null): void => {
-  console.log(file.size)
+  if (!file) return
+
   // Check file extension
   if (!checkExtension(file)) {
     emit('error', {
@@ -72,7 +82,7 @@ const handleFileChange = (file: File | null): void => {
   }
 
   // Check file size
-  if (file.size > props.maxFileSize) {
+  if (props.maxFileSize && file.size > props.maxFileSize) {
     emit('error', {
       type: 'FILE_SIZE_EXCEEDED',
       message: `File size exceeds the maximum limit of ${props.maxFileSize / (1024 * 1024)} MB`
@@ -95,8 +105,8 @@ const handleImageCrop = (blob: Blob | null) => {
   uploadImage()
 }
 
-const fireSuccessEvent = (): void => {
-  emit('success')
+const fireSuccessEvent = (data: object): void => {
+  emit('success', data)
 }
 
 const fireErrorEvent = () => {
@@ -113,29 +123,28 @@ const uploadImage: () => void = () => {
 
   formData.append('file', image)
 
-  Object.keys(props.data).forEach(key => {
-    formData.append(key, props.data[key])
+  props.data && Object.keys(props.data).forEach(key => {
+    props.data && formData.append(key, props.data[key])
   })
 
   xhr.open("POST", props.url, true);
 
   // Set headers dynamically from props.headers
-  Object.keys(props.headers).forEach(key => {
-    xhr.setRequestHeader(key, props.headers[key])
+  props.headers && Object.keys(props.headers).forEach(key => {
+    props.headers && xhr.setRequestHeader(key, props.headers[key])
   })
 
   // Progress event
   xhr.upload.onprogress = function(event) {
     if (event.lengthComputable) {
-      uploadProgress.value = (event.loaded / event.total) * 100;
+      progress.value = (event.loaded / event.total) * 100;
     }
   };
 
   // Success event
   xhr.onload = function() {
     if (xhr.status === 200) {
-      console.log('xhr', xhr)
-      fireSuccessEvent(response)
+      fireSuccessEvent(JSON.parse(xhr.responseText));
     } else {
       fireErrorEvent()
     }
@@ -154,7 +163,7 @@ const uploadImage: () => void = () => {
 <template>
   <FileUploader @change="handleFileChange">
     <template #default="props">
-      <slot v-bind="props"></slot>
+      <slot v-bind="{ ...props, progress, loading }"></slot>
     </template>
   </FileUploader>
 
