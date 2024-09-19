@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import FileUploader from './FileUploader.vue'
 import ImageCropTool from './ImageCropTool.vue'
+import Cropper from 'cropperjs';
 
 
 /**
@@ -19,6 +20,8 @@ interface Props {
   headers?: object,
   extensions?: string;
   data?: object;
+  aspectRatio?: number;
+  cropperOptions?: Cropper.Options;
 }
 
 
@@ -36,6 +39,7 @@ const emit = defineEmits<{
  */
 const props = withDefaults(defineProps<Props>(), {
   extensions: 'png,jpg,gif,jpeg',
+  cropperOptions: () => ({}),
 })
 
 
@@ -192,6 +196,8 @@ const uploadImage: () => void = () => {
     <ImageCropTool 
       v-if="isCropEnabled && selectedFile" 
       :src="selectedFile"
+      :aspectRatio="props.aspectRatio"
+      :options="cropperOptions"
       @cancel="disableCrop"
       @crop="handleImageCrop"
     />

@@ -17,6 +17,7 @@ const emit = defineEmits<{
  */
 interface Props {
   src: File;
+  aspectRatio?: number;
   options?: Cropper.Options;
 }
 
@@ -38,6 +39,7 @@ const cropper = ref<Cropper | null>(null);
  */
 const cropperConfig = computed((): Cropper.Options => ({
   ...props.options,
+  aspectRatio: props.aspectRatio,
 }));
 
 const imageUrl = computed((): string => {
