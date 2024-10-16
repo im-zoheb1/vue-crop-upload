@@ -136,8 +136,11 @@ const uploadImage: () => void = () => {
 
   const xhr: XMLHttpRequest = new XMLHttpRequest();
   const formData: FormData = new FormData();
+  const imageFile: File = new File([image], selectedFile.value?.name ?? 'NIL', {
+    type: selectedFile.value?.type ?? 'image/jpeg',
+  })
 
-  formData.append('file', new File([image], selectedFile.value?.name ?? 'NIL'))
+  formData.append('file', imageFile)
 
   props.data && Object.keys(props.data).forEach(key => {
     props.data && formData.append(key, props.data[key])

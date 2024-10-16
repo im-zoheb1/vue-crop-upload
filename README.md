@@ -1,56 +1,68 @@
 # Vue Image Uploader
 
-A Vue 3 component for uploading and cropping images with progress tracking. This component uses [Cropper.js](https://github.com/fengyuanchen/cropperjs) for image cropping functionality.
+VueCropUpload is a Vue 3 component that provides image uploading functionality with built-in cropping capabilities. It allows users to select an image file, crop it, and upload it to a specified URL.
+
+This component uses [Cropper.js](https://github.com/fengyuanchen/cropperjs), a powerful JavaScript image cropping library.
 
 ## Features
 
-- File selection with drag and drop support
-- Image cropping functionality powered by Cropper.js
-- File type and size validation
-- Upload progress tracking
-- Customizable through props
-- TypeScript support
+- Vue 3 component for image uploading with built-in cropping functionality
+- Integrates Cropper.js for powerful image cropping capabilities
+- Customizable file type restrictions
+- Configurable maximum file size limit
+- Custom headers and additional data support for upload requests
+- Adjustable aspect ratio for image cropping
+- Progress tracking for upload process
+- Error handling for various upload scenarios
+- Responsive design suitable for various screen sizes
+- Easy to integrate with existing Vue 3 projects
+- Lightweight and performant
+- Fully typed for TypeScript projects
 
 ## Installation
 
 ```bash
-npm install vue-image-uploader
+npm install vue-crop-upload
+```
+
+```bash
+import { VueCropUpload } from 'vue-crop-upload'
+import 'vue-crop-upload/dist/style.css'
 ```
 
 ## Usage
 
 ```vue
 <template>
-  <VueImageUploader
+  <VueCropUpload
     :url="uploadUrl"
-    :ratio="1"
-    :maxFileSize="5242880"
-    :headers="{ 'Authorization': 'Bearer token' }"
-    :extensions="'png,jpg,jpeg'"
-    :data="{ userId: '123' }"
-    @success="handleUploadSuccess"
-    @error="handleUploadError"
+    :extensions="allowedExtensions"
+    :headers="headers"
+    :data="additionalData"
+    :maxFileSize="maxSize"
+    :aspectRatio="cropAspectRatio"
+    @error="handleError"
+    @success="handleSuccess"
   >
-    <template #default="{ isDragging, openFileDialog }">
-      <div @click="openFileDialog" :class="{ 'dragging': isDragging }">
-        Drop your image here or click to select
-      </div>
+    <template #default="{ activator, progress, loading }">
+      <button @click="activator" :disabled="loading">
+        {{ loading ? `Uploading (${progress}%)` : 'Upload Image' }}
+      </button>
     </template>
-  </VueImageUploader>
+  </VueCropUpload>
 </template>
 
-<script setup lang="ts">
-import VueImageUploader from 'vue-image-uploader';
-
-const uploadUrl = 'https://api.example.com/upload';
-
-const handleUploadSuccess = (response) => {
-  console.log('Upload successful:', response);
-};
-
-const handleUploadError = (error) => {
-  console.error('Upload failed:', error);
-};
+<script>
+export default {
+  methods: {
+    handleSuccess({ data }) {
+      console.log('Upload successful:', data)
+    },
+    handleError(error) {
+      console.error('Upload error:', error.message)
+    }
+  }
+}
 </script>
 ```
 
@@ -59,11 +71,11 @@ const handleUploadError = (error) => {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | url | string | - | The URL to upload the image to (required) |
+| extensions | string | 'png,jpg,gif,jpeg' | Comma-separated list of allowed file extensions |
+| headers | object | {} | Additional headers to send with the upload request |
+| data | object | {} | Additional data to send with the upload request |
 | ratio | number | - | Aspect ratio for image cropping |
 | maxFileSize | number | - | Maximum file size in bytes |
-| headers | object | {} | Additional headers to send with the upload request |
-| extensions | string | 'png,jpg,gif,jpeg' | Comma-separated list of allowed file extensions |
-| data | object | {} | Additional data to send with the upload request |
 
 ## Events
 
@@ -76,8 +88,11 @@ const handleUploadError = (error) => {
 
 The component provides a default slot that exposes the following properties:
 
-- `isDragging`: Boolean indicating if a file is being dragged over the component
-- `openFileDialog`: Function to programmatically open the file selection dialog
+- `activator`: Function to trigger the file selection dialog
+- `progress`: Number representing the upload progress (0-100)
+- `loading`: Boolean indicating whether an upload is in progress
+
+Use these properties to create your custom upload button UI.
 
 ## Development
 
@@ -87,12 +102,13 @@ To set up the project for development:
 2. Install dependencies: `npm install`
 3. Start the development server: `npm run dev`
 
-## Building
+## Types
 
-To build the component for production:
-
-```bash
-npm run build
+```javascript
+interface ErrorEvent {
+  type: 'INVALID_FILE_EXTENSION' | 'FILE_SIZE_EXCEEDED' | 'UPLOAD_ERROR' | 'INVALID_FILE_TYPE';
+  message: string;
+}
 ```
 
 ## Contributing
