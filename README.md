@@ -129,3 +129,5 @@ This project is licensed under the MIT License.
 ## Credits
 
 - Image cropping functionality is provided by [Cropper.js](https://github.com/fengyuanchen/cropperjs), created by [Chen Fengyuan](https://github.com/fengyuanchen).
+
+- This is a Vue 3 implementation inspired by the concept of vue-image-crop-upload, but built from the ground up for Vue 3

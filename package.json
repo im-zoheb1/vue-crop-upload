@@ -1,21 +1,21 @@
 {
-  "name": "vue-crop-upload",
+  "name": "vue3-image-crop-upload",
   "version": "1.0.0",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/im-zoheb1/vue-core-upload"
+    "url": "https://github.com/im-zoheb1/vue3-image-core-upload"
   },
   "files": [
     "dist"
   ],
-  "main": "./dist/vue-crop-upload.umd.cjs",
-  "module": "./dist/vue-crop-upload.js",
+  "main": "./dist/vue3-image-crop-upload.umd.cjs",
+  "module": "./dist/vue3-image-crop-upload.js",
   "types": "./dist/main.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/vue-crop-upload.js",
-      "require": "./dist/vue-crop-upload.umd.js"
+      "import": "./dist/vue3-image-crop-upload.js",
+      "require": "./dist/vue3-image-crop-upload.umd.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@types/jest": "^29.5.13",
-    "core-image-xhr": "^1.0.5",
     "cropperjs": "^1.6.2",
     "vue": "^3.4.37"
   },
