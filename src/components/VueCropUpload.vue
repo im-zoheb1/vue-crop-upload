@@ -4,7 +4,6 @@ import FileUploader from './FileUploader.vue'
 import ImageCropTool from './ImageCropTool.vue'
 import Cropper from 'cropperjs';
 
-
 /**
  * Types
  */
