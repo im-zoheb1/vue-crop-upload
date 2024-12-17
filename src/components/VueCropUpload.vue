@@ -202,7 +202,11 @@ const uploadImage: () => void = () => {
       :options="cropperOptions"
       @cancel="disableCrop"
       @crop="handleImageCrop"
-    />
+    >
+      <template #header="props">
+        <slot name="header" v-bind="props"></slot>
+      </template>
+    </ImageCropTool>
   </teleport>
 </template>
 

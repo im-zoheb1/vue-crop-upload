@@ -4,6 +4,14 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 
 /**
+ * Interface
+ */
+interface HeaderSlotProps {
+  triggerCancel: () => void;
+  handleImageCrop: () => void;
+}
+
+/**
  * Events
  */
 const emit = defineEmits<{
@@ -48,6 +56,13 @@ const imageUrl = computed((): string => {
 
 const cropperHeight = computed((): string => {
   return `calc(100vh - ${headerRef.value?.clientHeight ?? 80}px)`
+})
+
+const headerSlotProps = computed((): HeaderSlotProps => {
+  return {
+    triggerCancel: handleCancel,
+    triggerCrop: handleImageCrop,
+  }
 })
 
 
@@ -104,17 +119,19 @@ const handleCancel = (): void => {
   <div class="vcu-dialog">
     <div class="vcu-wrapper">
       <div ref="headerRef" class="vcu-header">
-        <div class="vcu-header-container">
-          <h4>Upload Image</h4>
-          <div>
-            <button @click="handleCancel">
-              Cancel
-            </button>
-            <button class="primary" @click="handleImageCrop">
-              Upload
-            </button>
+        <slot name="header" v-bind="headerSlotProps">
+          <div class="vcu-header-container">
+            <h4>Upload Image</h4>
+            <div>
+              <button @click="handleCancel">
+                Cancel
+              </button>
+              <button class="primary" @click="handleImageCrop">
+                Upload
+              </button>
+            </div>
           </div>
-        </div>
+        </slot>
       </div>
       <div class="vcu-content">
         <img 
